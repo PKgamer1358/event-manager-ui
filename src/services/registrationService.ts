@@ -26,4 +26,14 @@ export const registrationService = {
     );
     return response.data;
   },
+
+  async exportEventRegistrations(eventId: number): Promise<Blob> {
+   const response = await axiosInstance.get(
+     `/api/registrations/events/${eventId}/export`,
+     { responseType: "blob" }
+   );
+   return response.data;
+ }
+
 };
+

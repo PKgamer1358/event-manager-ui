@@ -29,7 +29,7 @@ export const authService = {
       email: decoded?.email || credentials.username,
       first_name: decoded?.first_name || "",
       last_name: decoded?.last_name || "",
-      college_id: decoded?.college_id || 0,
+      // college_id: decoded?.college_id || 0,
       roll_number: decoded?.roll_number || "",
       branch: decoded?.branch || "",
       year: decoded?.year || 1,

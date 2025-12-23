@@ -15,7 +15,7 @@ import Signup from "./pages/Signup";
 import EventList from "./pages/EventList";
 import EventDetails from "./pages/EventDetails";
 import MyRegistrations from "./pages/MyRegistrations";
-import Colleges from "./pages/Colleges";
+// import Colleges from "./pages/Colleges";
 
 const theme = createTheme({
   palette: {
@@ -63,14 +63,14 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/colleges"
               element={
                 <PrivateRoute adminOnly>
                   <Colleges />
                 </PrivateRoute>
               }
-            />
+            /> */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>

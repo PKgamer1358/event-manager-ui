@@ -15,13 +15,22 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useNavigate } from "react-router-dom";
 import { Registration } from "../types";
 import { registrationService } from "../services/registrationService";
+import { useAuth } from "../context/AuthContext";
+
 
 const MyRegistrations: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, isAdmin } = useAuth();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+  if (!isAuthenticated || isAdmin) {
+    navigate("/events");
+  }
+}, [isAuthenticated, isAdmin, navigate]);
 
   const fetchRegistrations = async () => {
     try {
@@ -37,8 +46,11 @@ const MyRegistrations: React.FC = () => {
   };
 
   useEffect(() => {
+  if (isAuthenticated && !isAdmin) {
     fetchRegistrations();
-  }, []);
+  }
+}, [isAuthenticated, isAdmin]);
+
 
   const handleUnregister = async (eventId: number) => {
     if (

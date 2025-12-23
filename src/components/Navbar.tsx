@@ -53,8 +53,11 @@ const Navbar: React.FC = () => {
   const pages = isAuthenticated
     ? [
         { label: "Events", path: "/events" },
-        { label: "My Registrations", path: "/my-registrations" },
-        ...(isAdmin ? [{ label: "Colleges", path: "/colleges" }] : []),
+        // { label: "My Registrations", path: "/my-registrations" },
+        // ...(isAdmin ? [{ label: "Colleges", path: "/colleges" }] : []),
+        ...(!isAdmin
+        ? [{ label: "My Registrations", path: "/my-registrations" }]
+        : []),
       ]
     : [];
 

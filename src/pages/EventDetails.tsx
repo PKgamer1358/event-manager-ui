@@ -131,6 +131,27 @@ const EventDetails: React.FC = () => {
       minute: "2-digit",
     });
   };
+  
+  const handleExportRegistrations = async () => {
+  if (!id) return;
+
+  try {
+    const blob = await registrationService.exportEventRegistrations(
+      parseInt(id)
+    );
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${event?.title || "event"}_registrations.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    setError("Failed to export registrations");
+  }
+};
 
   if (loading) {
     return (
@@ -277,13 +298,27 @@ const EventDetails: React.FC = () => {
           )}
 
           {isAdmin && (
-            <Button
-              variant="outlined"
-              onClick={() => setShowRegistrations(true)}
-            >
-              View Registrations ({registrations.length})
-            </Button>
-          )}
+  <>
+    <Button
+      variant="outlined"
+      onClick={() => setShowRegistrations(true)}
+    >
+      View Registrations ({registrations.length})
+    </Button>
+
+   <Button
+  variant="contained"
+  color="success"
+  disabled={registrations.length === 0}
+  onClick={handleExportRegistrations}
+>
+  Export to Excel
+</Button>
+  </>
+)}
+
+
+
 
           <Button variant="outlined" onClick={() => navigate("/events")}>
             Back to Events

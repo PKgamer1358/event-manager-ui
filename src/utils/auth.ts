@@ -7,7 +7,7 @@ interface DecodedToken {
   email?: string;
   first_name?: string;
   last_name?: string;
-  college_id?: number;
+  // college_id?: number;
   roll_number?: string;
   branch?: string;
   year?: number;

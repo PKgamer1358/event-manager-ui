@@ -4,7 +4,7 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  college_id: number;
+  // college_id: number;
   roll_number: string;
   branch: string;
   year: number;
@@ -43,10 +43,10 @@ export interface SignupRequest {
   password: string;
   first_name: string;
   last_name: string;
-  college_id: number;
+  // college_id: number;
   roll_number: string;
   branch: string;
-  year: number;
+  year_of_study: number;
   is_admin?: boolean;
 }
 
