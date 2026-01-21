@@ -3,11 +3,9 @@ import {
   Routes,
   Route,
   Navigate,
-  useLocation,
 } from "react-router-dom";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { useAuth } from "./context/AuthContext";
-import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -52,11 +50,6 @@ function App() {
    ROUTES
 ======================= */
 const AppRoutes: React.FC = () => {
-  const location = useLocation();
-
-  const hideNavbar =
-    location.pathname === "/login" ||
-    location.pathname === "/signup";
 
   return (
     <>

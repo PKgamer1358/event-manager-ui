@@ -15,8 +15,6 @@ import {
   ListItem,
   ListItemText,
   Stack,
-  Card,
-  CardMedia,
   Grid,
   Tabs,
   Tab,

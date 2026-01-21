@@ -1,7 +1,6 @@
 import React from "react";
 import { Box, Container, Fade } from "@mui/material";
 import Navbar from "../components/Navbar";
-import { Outlet } from "react-router-dom"; // Use Outlet if we use Layout Routes, or just children
 
 interface MainLayoutProps {
     children?: React.ReactNode;

@@ -16,15 +16,11 @@ import {
   Collapse,
   Alert,
   FormControl,
-  Container,
-  IconButton
+  Container
 } from "@mui/material";
 import PageHeader from "../components/PageHeader";
 import EventCard from "../components/EventCard";
 import AddIcon from "@mui/icons-material/Add";
-import EventIcon from "@mui/icons-material/Event";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import PeopleIcon from "@mui/icons-material/People";
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
 import { Event } from "../types";
@@ -32,7 +28,6 @@ import { eventService } from "../services/eventService";
 import { useAuth } from "../context/AuthContext";
 import CreateEventModal from "../components/CreateEventModal";
 import HomeInsightsView from "../components/HomeInsights";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import PullToRefresh from "../components/PullToRefresh";
 
 const EventList: React.FC = () => {
@@ -130,16 +125,6 @@ const EventList: React.FC = () => {
   const handleEventCreated = () => {
     fetchEvents();
     setOpenModal(false);
-  };
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   };
 
   if (loading) {

@@ -8,7 +8,6 @@ import {
     Button,
     CardActions,
     Stack,
-    alpha,
     useTheme
 } from '@mui/material';
 import { Event } from '../types';
@@ -24,11 +23,6 @@ interface EventCardProps {
 
 const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     const theme = useTheme();
-
-    const handleDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-    };
 
     const handleTime = (dateString: string) => {
         return new Date(dateString).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });

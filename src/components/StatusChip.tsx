@@ -1,5 +1,5 @@
 import React from "react";
-import { Chip, ChipProps, alpha, darken } from "@mui/material";
+import { Chip, ChipProps } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 interface StatusChipProps extends Omit<ChipProps, "color"> {

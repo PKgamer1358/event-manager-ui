@@ -3,7 +3,6 @@ import {
   Box,
   Card,
   CardContent,
-  Typography,
   Table,
   TableHead,
   TableRow,
@@ -25,7 +24,6 @@ import { User } from "../types";
 import { useAuth } from "../context/AuthContext";
 
 import PageHeader from "../components/PageHeader";
-import StatusChip from "../components/StatusChip";
 
 const AdminUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
