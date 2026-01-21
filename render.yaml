@@ -1,0 +1,13 @@
+services:
+  - type: static
+    name: event-manager-ui
+    env: static
+    buildCommand: npm install && npm run build
+    publishDir: build
+    envVars:
+      - key: REACT_APP_API_BASE_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
