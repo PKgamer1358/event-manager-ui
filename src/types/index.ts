@@ -7,14 +7,20 @@ export interface User {
   // college_id: number;
   roll_number: string;
   branch: string;
-  year: number;
+  year_of_study: number;
   is_admin: boolean;
+  is_super_admin: boolean;
+  is_active: boolean; // ✅ REQUIRED
+  created_at?: string;
 }
 
 export interface Event {
+  image_url?: string;
   id: number;
   title: string;
   description: string;
+  category: string;   // ✅ ADD
+  club?: string;
   venue: string;
   start_time: string;
   end_time: string;
@@ -51,6 +57,7 @@ export interface SignupRequest {
 }
 
 export interface AuthResponse {
+  token: string;
   access_token: string;
   token_type: string;
 }
@@ -58,6 +65,8 @@ export interface AuthResponse {
 export interface EventFormData {
   title: string;
   description: string;
+  category: string;   // ✅ ADD
+  club?: string;
   venue: string;
   start_time: string;
   end_time: string;
@@ -84,4 +93,53 @@ export interface CollegeFormData {
   contact_phone: string;
   website?: string;
   is_active: boolean;
+}
+
+export interface EventMedia {
+  id: number;
+  event_id: number;
+  file_url: string;
+  file_type: string;
+  uploaded_at: string;
+}
+
+export interface Notification {
+  id: number;
+  title: string;
+  body: string;
+  created_at: string;
+  is_read: boolean;
+}
+
+export interface InsightEvent {
+  id: number;
+  title: string;
+  date: string;
+}
+
+export interface EventInsights {
+  demand_level: string;
+  top_demographics: string[];
+  similar_events: InsightEvent[];
+}
+
+export interface GlobalInsights {
+  trending_events?: InsightEvent[];
+  total_events_this_week?: number;
+  total_registrations_today?: number;
+  // Admin fields (Legacy)
+  pending_users_count?: number;
+  at_risk_events_count?: number;
+  total_users_count?: number;
+
+  // Admin fields (New)
+  total_events_active?: number;
+  total_events_past?: number;
+  total_registrations_all_time?: number;
+  total_registrations_this_week?: number;
+
+  // Most Popular
+  most_popular_event_title?: string;
+  most_popular_event_id?: number;
+  most_popular_event_count?: number;
 }

@@ -11,15 +11,21 @@ import {
   Button,
   Tooltip,
   MenuItem,
+  useTheme,
+  alpha,
+  Divider
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import EventIcon from "@mui/icons-material/Event";
-import { useNavigate } from "react-router-dom";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
-  const { user, logout, isAuthenticated, isAdmin } = useAuth();
+  const location = useLocation();
+  const theme = useTheme();
+  const { user, logout, isAuthenticated, isAdmin, isSuperAdmin } = useAuth();
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -52,20 +58,32 @@ const Navbar: React.FC = () => {
 
   const pages = isAuthenticated
     ? [
-        { label: "Events", path: "/events" },
-        // { label: "My Registrations", path: "/my-registrations" },
-        // ...(isAdmin ? [{ label: "Colleges", path: "/colleges" }] : []),
-        ...(!isAdmin
+      { label: "Events", path: "/events" },
+      ...(!isAdmin && !isSuperAdmin
         ? [{ label: "My Registrations", path: "/my-registrations" }]
         : []),
-      ]
+      // If admin, they should go to dashboard, but maybe they want to see event list as user too?
+      // Keeping it simple. Admin specific links are in AdminLayout sidebar now. 
+      // This Navbar is primarily for "User Mode".
+    ]
     : [];
 
+  // If user is admin, add a link to switch to Admin Users
+  if (isSuperAdmin && isAuthenticated) {
+    pages.push({ label: "Users", path: "/admin/users" });
+    pages.push({ label: "All Registrations", path: "/admin/events/registrations" });
+  }
+
   return (
-    <AppBar position="static">
+    <AppBar position="sticky" elevation={0} sx={{
+      bgcolor: alpha(theme.palette.background.paper, 0.8),
+      backdropFilter: 'blur(20px)',
+      borderBottom: `1px solid ${theme.palette.divider}`,
+    }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <EventIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+          {/* LOGO DESKTOP */}
+          <EventIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1, color: 'primary.main' }} />
           <Typography
             variant="h6"
             noWrap
@@ -74,26 +92,26 @@ const Navbar: React.FC = () => {
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              color: "text.primary",
               textDecoration: "none",
               cursor: "pointer",
             }}
           >
-            EVENT MANAGER
+            EVENT<Box component="span" sx={{ color: 'primary.main' }}>MANAGER</Box>
           </Typography>
 
+          {/* MOBILE MENU */}
           {isAuthenticated && (
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
-                aria-label="account of current user"
                 aria-controls="menu-appbar"
                 aria-haspopup="true"
                 onClick={handleOpenNavMenu}
-                color="inherit"
+                color="default"
               >
                 <MenuIcon />
               </IconButton>
@@ -127,7 +145,8 @@ const Navbar: React.FC = () => {
             </Box>
           )}
 
-          <EventIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+          {/* LOGO MOBILE */}
+          <EventIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1, color: 'primary.main' }} />
           <Typography
             variant="h5"
             noWrap
@@ -137,36 +156,56 @@ const Navbar: React.FC = () => {
               mr: 2,
               display: { xs: "flex", md: "none" },
               flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              color: "inherit",
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 800,
+              letterSpacing: "-0.02em",
+              color: "text.primary",
               textDecoration: "none",
               cursor: "pointer",
             }}
           >
-            EVENTS
+            EMS
           </Typography>
 
+          {/* DESKTOP NAV LINKS */}
           {isAuthenticated && (
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              {pages.map((page) => (
-                <Button
-                  key={page.label}
-                  onClick={() => handleNavigation(page.path)}
-                  sx={{ my: 2, color: "white", display: "block" }}
-                >
-                  {page.label}
-                </Button>
-              ))}
+            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, gap: 1 }}>
+              {pages.map((page) => {
+                const isActive = location.pathname === page.path;
+                return (
+                  <Button
+                    key={page.label}
+                    onClick={() => handleNavigation(page.path)}
+                    sx={{
+                      my: 2,
+                      color: isActive ? 'primary.main' : 'text.secondary',
+                      display: "block",
+                      fontWeight: isActive ? 600 : 500,
+                      backgroundColor: isActive ? alpha(theme.palette.primary.main, 0.08) : 'transparent',
+                      '&:hover': {
+                        backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                        color: 'primary.main'
+                      }
+                    }}
+                  >
+                    {page.label}
+                  </Button>
+                );
+              })}
             </Box>
           )}
 
+          {/* USER SETTINGS */}
           {isAuthenticated ? (
-            <Box sx={{ flexGrow: 0 }}>
+            <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 1 }}>
+              {!isAdmin && !isSuperAdmin && (
+                <IconButton onClick={() => navigate('/notifications')} sx={{ color: 'text.secondary' }}>
+                  <NotificationsIcon />
+                </IconButton>
+              )}
               <Tooltip title="Open settings">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <Avatar alt={user?.username || user?.email}>
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, border: `2px solid ${theme.palette.primary.light}` }}>
+                  <Avatar alt={user?.username || user?.email} src="/static/images/avatar/2.jpg" sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
                     {user?.first_name?.charAt(0).toUpperCase() ||
                       user?.username?.charAt(0).toUpperCase() ||
                       user?.email?.charAt(0).toUpperCase()}
@@ -188,23 +227,32 @@ const Navbar: React.FC = () => {
                 }}
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
+                PaperProps={{
+                  elevation: 4,
+                  sx: { borderRadius: 2, minWidth: 180 }
+                }}
               >
-                <MenuItem disabled>
-                  <Typography textAlign="center">
-                    {user?.username || user?.email} {isAdmin && "(Admin)"}
-                  </Typography>
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                  <Typography textAlign="center">Logout</Typography>
+                <Box sx={{ px: 2, py: 1.5 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{user?.username}</Typography>
+                  <Typography variant="caption" color="text.secondary">{user?.email}</Typography>
+                </Box>
+                <Divider />
+                {!isAdmin && !isSuperAdmin && (
+                  <MenuItem onClick={() => handleNavigation("/notifications")}>
+                    Notifications
+                  </MenuItem>
+                )}
+                <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                  Logout
                 </MenuItem>
               </Menu>
             </Box>
           ) : (
-            <Box sx={{ flexGrow: 0 }}>
-              <Button color="inherit" onClick={() => navigate("/login")}>
-                Login
+            <Box sx={{ flexGrow: 0, display: 'flex', gap: 2 }}>
+              <Button color="inherit" onClick={() => navigate("/login")} sx={{ color: 'text.primary', fontWeight: 600 }}>
+                Log in
               </Button>
-              <Button color="inherit" onClick={() => navigate("/signup")}>
+              <Button variant="contained" onClick={() => navigate("/signup")} sx={{ borderRadius: 50, px: 3 }}>
                 Sign Up
               </Button>
             </Box>

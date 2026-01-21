@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import { eventService } from "../services/eventService";
 import { EventFormData } from "../types";
+import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
+
 
 interface CreateEventModalProps {
   open: boolean;
@@ -21,6 +23,8 @@ interface CreateEventModalProps {
     id: number;
     title: string;
     description: string;
+    category: string;   // ✅ ADD
+    club?: string; 
     venue: string;
     start_time: string;
     end_time: string;
@@ -38,6 +42,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const [formData, setFormData] = useState<EventFormData>({
     title: "",
     description: "",
+    category: "",     
+    club: "", 
     venue: "",
     start_time: "",
     end_time: "",
@@ -69,6 +75,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         setFormData({
           title: "",
           description: "",
+          category: "",     
+    club: "", 
           venue: "",
           start_time: "",
           end_time: "",
@@ -87,6 +95,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     setFormData({
       title: "",
       description: "",
+      category: "",     
+    club: "", 
       venue: "",
       start_time: "",
       end_time: "",
@@ -97,17 +107,20 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   };
 
   React.useEffect(() => {
-    if (eventToEdit) {
-      setFormData({
-        title: eventToEdit.title,
-        description: eventToEdit.description,
-        venue: eventToEdit.venue,
-        start_time: eventToEdit.start_time,
-        end_time: eventToEdit.end_time,
-        capacity: eventToEdit.capacity,
-      });
-    }
-  }, [eventToEdit]);
+  if (eventToEdit) {
+    setFormData({
+      title: eventToEdit.title,
+      description: eventToEdit.description,
+      category: eventToEdit.category, // ✅ ADD
+      club: eventToEdit.club || "",   // ✅ ADD
+      venue: eventToEdit.venue,
+      start_time: eventToEdit.start_time,
+      end_time: eventToEdit.end_time,
+      capacity: eventToEdit.capacity,
+    });
+  }
+}, [eventToEdit]);
+
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -139,6 +152,33 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             value={formData.description}
             onChange={handleChange}
           />
+          <FormControl fullWidth margin="normal" required>
+  <InputLabel>Category</InputLabel>
+  <Select
+    name="category"
+    value={formData.category}
+    label="Category"
+    onChange={(e) =>
+      setFormData({ ...formData, category: e.target.value })
+    }
+  >
+    <MenuItem value="Technical">Technical</MenuItem>
+    <MenuItem value="Cultural">Cultural</MenuItem>
+    <MenuItem value="Sports">Sports</MenuItem>
+  </Select>
+</FormControl>
+<TextField
+  margin="normal"
+  fullWidth
+  name="club"
+  label="Club (Optional)"
+  placeholder="IEEE, CSI, Coding Club"
+  value={formData.club}
+  onChange={handleChange}
+/>
+
+
+          
           <TextField
             margin="normal"
             required

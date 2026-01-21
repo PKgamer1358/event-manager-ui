@@ -1,26 +1,48 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import React, { JSX } from "react";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 interface PrivateRouteProps {
-  children: React.ReactElement;
+  children: JSX.Element;
   adminOnly?: boolean;
+  superAdminOnly?: boolean;
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({
   children,
   adminOnly = false,
+  superAdminOnly = false,
 }) => {
-  const { isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin, isSuperAdmin, loading } = useAuth();
+  const location = useLocation();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  // ⏳ Wait until auth state is restored
+  if (loading) {
+    return null; // or a spinner if you want
   }
 
-  if (adminOnly && !isAdmin) {
+  // 🔒 Not logged in → redirect to login
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+        state={{ from: location }}
+      />
+    );
+  }
+
+  // 🔐 Super admin only route
+  if (superAdminOnly && !isSuperAdmin) {
     return <Navigate to="/events" replace />;
   }
 
+  // 🔐 Admin only route
+  if (adminOnly && !isAdmin && !isSuperAdmin) {
+    return <Navigate to="/events" replace />;
+  }
+
+  // ✅ Access granted
   return children;
 };
 

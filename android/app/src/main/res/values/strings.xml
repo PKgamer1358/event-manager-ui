@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">EVENTZ</string>
+    <string name="title_activity_main">EVENTZ</string>
+    <string name="package_name">com.eventmanage.app</string>
+    <string name="custom_url_scheme">com.eventmanage.app</string>
+</resources>

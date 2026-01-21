@@ -1,12 +1,12 @@
 import React from "react";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
-import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
-import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { useAuth } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import PrivateRoute from "./components/PrivateRoute";
 import Home from "./pages/Home";
@@ -15,68 +15,128 @@ import Signup from "./pages/Signup";
 import EventList from "./pages/EventList";
 import EventDetails from "./pages/EventDetails";
 import MyRegistrations from "./pages/MyRegistrations";
-// import Colleges from "./pages/Colleges";
+import AdminUsers from "./pages/AdminUsers";
+import AdminEventRegistrations from "./pages/AdminEventRegistrations";
+import Notifications from "./pages/Notifications";
+import MainLayout from "./layouts/MainLayout";
+import theme from "./theme";
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#1976d2",
-    },
-    secondary: {
-      main: "#dc004e",
-    },
-  },
-});
+/* =======================
+   AUTH GATE
+======================= */
+const AuthGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { loading } = useAuth();
 
+  if (loading) {
+    return <div style={{ padding: 40 }}>Loading…</div>;
+  }
+
+  return <>{children}</>;
+};
+
+/* =======================
+   APP
+======================= */
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <Router>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route
-              path="/events"
-              element={
-                <PrivateRoute>
-                  <EventList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/events/:id"
-              element={
-                <PrivateRoute>
-                  <EventDetails />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/my-registrations"
-              element={
-                <PrivateRoute>
-                  <MyRegistrations />
-                </PrivateRoute>
-              }
-            />
-            {/* <Route
-              path="/colleges"
-              element={
-                <PrivateRoute adminOnly>
-                  <Colleges />
-                </PrivateRoute>
-              }
-            /> */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Router>
-      </AuthProvider>
+      <AuthGate>
+        <AppRoutes />
+      </AuthGate>
     </ThemeProvider>
   );
 }
+
+/* =======================
+   ROUTES
+======================= */
+const AppRoutes: React.FC = () => {
+  const location = useLocation();
+
+  const hideNavbar =
+    location.pathname === "/login" ||
+    location.pathname === "/signup";
+
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<MainLayout><Home /></MainLayout>} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        <Route
+          path="/events"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <EventList />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/events/:id"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <EventDetails />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/my-registrations"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <MyRegistrations />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/admin/users"
+          element={
+            <PrivateRoute superAdminOnly>
+              <MainLayout>
+                <AdminUsers />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/admin/events/registrations"
+          element={
+            <PrivateRoute superAdminOnly>
+              <MainLayout>
+                <AdminEventRegistrations />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+
+
+
+        <Route
+          path="/notifications"
+          element={
+            <PrivateRoute>
+              <MainLayout>
+                <Notifications />
+              </MainLayout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </>
+  );
+};
 
 export default App;

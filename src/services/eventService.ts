@@ -25,4 +25,39 @@ export const eventService = {
   async deleteEvent(id: number): Promise<void> {
     await axiosInstance.delete(`/api/events/${id}`);
   },
+
+  async getEventMedia(id: number): Promise<import("../types").EventMedia[]> {
+    const response = await axiosInstance.get<import("../types").EventMedia[]>(
+      `/api/events/${id}/media`
+    );
+    return response.data;
+  },
+
+  async uploadEventMedia(id: number, file: File): Promise<void> {
+    const formData = new FormData();
+    formData.append("file", file);
+    await axiosInstance.post(`/api/events/${id}/upload`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+
+  async deleteEventMedia(eventId: number, mediaId: number): Promise<void> {
+    await axiosInstance.delete(`/api/events/${eventId}/media/${mediaId}`);
+  },
+
+  async getEventInsights(id: number): Promise<import("../types").EventInsights> {
+    const response = await axiosInstance.get<import("../types").EventInsights>(
+      `/api/events/${id}/insights`
+    );
+    return response.data;
+  },
+
+  async getGlobalInsights(): Promise<import("../types").GlobalInsights> {
+    const response = await axiosInstance.get<import("../types").GlobalInsights>(
+      "/api/events/insights/global"
+    );
+    return response.data;
+  },
 };

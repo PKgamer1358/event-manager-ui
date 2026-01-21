@@ -3,20 +3,19 @@ import {
   Container,
   Typography,
   Box,
-  Card,
-  CardContent,
-  CardActions,
   Button,
   Alert,
-  Chip,
+  Grid,
+  CircularProgress,
+  Tabs,
+  Tab
 } from "@mui/material";
-import EventIcon from "@mui/icons-material/Event";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
+import EventCard from "../components/EventCard";
+import PageHeader from "../components/PageHeader";
 import { useNavigate } from "react-router-dom";
 import { Registration } from "../types";
 import { registrationService } from "../services/registrationService";
 import { useAuth } from "../context/AuthContext";
-
 
 const MyRegistrations: React.FC = () => {
   const navigate = useNavigate();
@@ -25,12 +24,13 @@ const MyRegistrations: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
-  if (!isAuthenticated || isAdmin) {
-    navigate("/events");
-  }
-}, [isAuthenticated, isAdmin, navigate]);
+    if (!isAuthenticated || isAdmin) {
+      navigate("/events");
+    }
+  }, [isAuthenticated, isAdmin, navigate]);
 
   const fetchRegistrations = async () => {
     try {
@@ -46,11 +46,10 @@ const MyRegistrations: React.FC = () => {
   };
 
   useEffect(() => {
-  if (isAuthenticated && !isAdmin) {
-    fetchRegistrations();
-  }
-}, [isAuthenticated, isAdmin]);
-
+    if (isAuthenticated && !isAdmin) {
+      fetchRegistrations();
+    }
+  }, [isAuthenticated, isAdmin]);
 
   const handleUnregister = async (eventId: number) => {
     if (
@@ -68,122 +67,111 @@ const MyRegistrations: React.FC = () => {
     }
   };
 
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   if (loading) {
     return (
-      <Container sx={{ mt: 4 }}>
-        <Typography>Loading your registrations...</Typography>
-      </Container>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+        <CircularProgress />
+      </Box>
     );
   }
 
-  return (
-    <Container sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        My Registrations
-      </Typography>
+  const now = new Date();
+  const upcomingEvents = registrations.filter(r => r.event && new Date(r.event.start_time) >= now);
+  const pastEvents = registrations.filter(r => r.event && new Date(r.event.start_time) < now);
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess("")}>
-          {success}
-        </Alert>
-      )}
-
-      {registrations.length === 0 ? (
-        <Box sx={{ textAlign: "center", mt: 4 }}>
-          <Typography variant="h6" color="text.secondary">
-            You haven't registered for any events yet
-          </Typography>
-          <Button
-            variant="contained"
-            sx={{ mt: 2 }}
-            onClick={() => navigate("/events")}
-          >
-            Browse Events
-          </Button>
-        </Box>
-      ) : (
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {registrations.map((registration) => (
-            <Card key={registration.id}>
-              <CardContent>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h5" component="h2" gutterBottom>
-                      {registration.event?.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      paragraph
-                    >
-                      {registration.event?.description}
-                    </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <LocationOnIcon fontSize="small" sx={{ mr: 1 }} />
-                      <Typography variant="body2">
-                        {registration.event?.venue}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                      <EventIcon fontSize="small" sx={{ mr: 1 }} />
-                      <Typography variant="body2">
-                        {registration.event?.start_time &&
-                          formatDateTime(registration.event.start_time)}
-                      </Typography>
-                    </Box>
-                    <Chip
-                      label={`Registered on ${formatDateTime(
-                        registration.registered_at
-                      )}`}
-                      size="small"
-                      color="success"
-                      sx={{ mt: 1 }}
-                    />
-                  </Box>
+  const renderEventList = (list: Registration[], showUnregister: boolean) => (
+    <Grid container spacing={3}>
+      {list.map((registration) => {
+        const event = registration.event;
+        if (!event) return null;
+        return (
+          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={registration.id}>
+            <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <EventCard
+                event={event}
+                onClick={() => navigate(`/events/${event.id}`)}
+              />
+              <Box sx={{ mt: 1, p: 1, bgcolor: 'background.paper', borderRadius: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: 1 }}>
+                <Box>
+                  <Typography variant="caption" display="block" color="text.secondary">Registered on</Typography>
+                  <Typography variant="body2" fontWeight="medium">
+                    {new Date(registration.registered_at).toLocaleDateString()}
+                  </Typography>
                 </Box>
-              </CardContent>
-              <CardActions>
-                <Button
-                  size="small"
-                  onClick={() => navigate(`/events/${registration.event_id}`)}
-                >
-                  View Event
-                </Button>
-                <Button
-                  size="small"
-                  color="error"
-                  onClick={() => handleUnregister(registration.event_id)}
-                >
-                  Unregister
-                </Button>
-              </CardActions>
-            </Card>
-          ))}
+                {showUnregister && (
+                  <Button
+                    size="small"
+                    color="error"
+                    onClick={() => handleUnregister(registration.event_id)}
+                  >
+                    Unregister
+                  </Button>
+                )}
+              </Box>
+            </Box>
+          </Grid>
+        );
+      })}
+    </Grid>
+  );
+
+  return (
+    <Box sx={{ pb: 8 }}>
+      <PageHeader
+        title="My Registrations"
+        subtitle="Manage your upcoming events and view past registrations."
+      />
+
+      <Container maxWidth="xl">
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>
+            {error}
+          </Alert>
+        )}
+
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess("")}>
+            {success}
+          </Alert>
+        )}
+
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
+            <Tab label={`Upcoming (${upcomingEvents.length})`} />
+            <Tab label={`History (${pastEvents.length})`} />
+          </Tabs>
         </Box>
-      )}
-    </Container>
+
+        {tabValue === 0 && (
+          <Box>
+            {upcomingEvents.length === 0 ? (
+              <Box sx={{ textAlign: "center", py: 6, bgcolor: 'background.paper', borderRadius: 2 }}>
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  No upcoming events.
+                </Typography>
+                <Button variant="contained" sx={{ mt: 2 }} onClick={() => navigate("/events")}>
+                  Browse Events
+                </Button>
+              </Box>
+            ) : (
+              renderEventList(upcomingEvents, true)
+            )}
+          </Box>
+        )}
+
+        {tabValue === 1 && (
+          <Box>
+            {pastEvents.length === 0 ? (
+              <Typography color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                No past events found.
+              </Typography>
+            ) : (
+              renderEventList(pastEvents, false)
+            )}
+          </Box>
+        )}
+      </Container>
+    </Box>
   );
 };
 

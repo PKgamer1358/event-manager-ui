@@ -8,10 +8,17 @@ import {
   Paper,
   Alert,
   Link as MuiLink,
+  IconButton,
+  InputAdornment,
+
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
+import { Navigate } from "react-router-dom";
+
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -22,6 +29,12 @@ const Login: React.FC = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+
+if (user) {
+  return <Navigate to="/events" replace />;
+}
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -38,7 +51,9 @@ const Login: React.FC = () => {
 
     try {
       const { token, user } = await authService.login(formData);
-      login(token, user);
+      await login(token, user);
+
+
       navigate("/events");
     } catch (err: any) {
       setError(
@@ -88,17 +103,31 @@ const Login: React.FC = () => {
               onChange={handleChange}
             />
             <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              value={formData.password}
-              onChange={handleChange}
-            />
+  margin="normal"
+  required
+  fullWidth
+  name="password"
+  label="Password"
+  type={showPassword ? "text" : "password"}
+  id="password"
+  autoComplete="current-password"
+  value={formData.password}
+  onChange={handleChange}
+  InputProps={{
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton
+          onClick={() => setShowPassword((prev) => !prev)}
+          onMouseDown={(e) => e.preventDefault()}
+          edge="end"
+        >
+          {showPassword ? <VisibilityOff /> : <Visibility />}
+        </IconButton>
+      </InputAdornment>
+    ),
+  }}
+/>
+
             <Button
               type="submit"
               fullWidth

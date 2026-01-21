@@ -1,5 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { User } from "../types";
+import { Storage } from "./storage";
 
 interface DecodedToken {
   sub: string;
@@ -7,28 +8,36 @@ interface DecodedToken {
   email?: string;
   first_name?: string;
   last_name?: string;
-  // college_id?: number;
   roll_number?: string;
   branch?: string;
   year?: number;
   is_admin: boolean;
+  is_super_admin?: boolean;
   exp: number;
 }
+
+/* =======================
+   TOKEN DECODE
+======================= */
 
 export const decodeToken = (token: string): DecodedToken | null => {
   try {
     return jwtDecode<DecodedToken>(token);
-  } catch (error) {
+  } catch {
     return null;
   }
 };
 
-export const getStoredToken = (): string | null => {
-  return localStorage.getItem("token");
+/* =======================
+   STORAGE (ASYNC)
+======================= */
+
+export const getStoredToken = async (): Promise<string | null> => {
+  return await Storage.get("token");
 };
 
-export const getStoredUser = (): User | null => {
-  const userStr = localStorage.getItem("user");
+export const getStoredUser = async (): Promise<User | null> => {
+  const userStr = await Storage.get("user");
   if (!userStr) return null;
   try {
     return JSON.parse(userStr);
@@ -37,15 +46,22 @@ export const getStoredUser = (): User | null => {
   }
 };
 
-export const setAuthData = (token: string, user: User): void => {
-  localStorage.setItem("token", token);
-  localStorage.setItem("user", JSON.stringify(user));
+export const setAuthData = async (
+  token: string,
+  user: User
+): Promise<void> => {
+  await Storage.set("token", token);
+  await Storage.set("user", JSON.stringify(user));
 };
 
-export const clearAuthData = (): void => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
+export const clearAuthData = async (): Promise<void> => {
+  await Storage.remove("token");
+  await Storage.remove("user");
 };
+
+/* =======================
+   TOKEN VALIDATION
+======================= */
 
 export const isTokenValid = (token: string): boolean => {
   const decoded = decodeToken(token);

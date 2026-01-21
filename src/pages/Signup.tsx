@@ -12,10 +12,14 @@ import {
   Select,
   FormControl,
   InputLabel,
+  IconButton,
+  InputAdornment,
+
 } from "@mui/material";
 import { useNavigate, Link } from "react-router-dom";
 import { authService } from "../services/authService";
-
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 const Signup: React.FC = () => {
   const navigate = useNavigate();
 
@@ -34,6 +38,8 @@ const Signup: React.FC = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -137,28 +143,60 @@ const Signup: React.FC = () => {
             />
 
             <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-            />
+  margin="normal"
+  required
+  fullWidth
+  name="password"
+  label="Password"
+  type={showPassword ? "text" : "password"}
+  id="password"
+  value={formData.password}
+  onChange={handleChange}
+  InputProps={{
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton
+          onClick={() => setShowPassword((prev) => !prev)}
+          onMouseDown={(e) => e.preventDefault()}
+          edge="end"
+        >
+          {showPassword ? <VisibilityOff /> : <Visibility />}
+        </IconButton>
+      </InputAdornment>
+    ),
+  }}
+/>
 
             <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="confirmPassword"
-              label="Confirm Password"
-              type="password"
-              id="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-            />
+  margin="normal"
+  required
+  fullWidth
+  name="confirmPassword"
+  label="Confirm Password"
+  type={showConfirmPassword ? "text" : "password"}
+  id="confirmPassword"
+  value={formData.confirmPassword}
+  onChange={handleChange}
+  InputProps={{
+    endAdornment: (
+      <InputAdornment position="end">
+        <IconButton
+          onClick={() =>
+            setShowConfirmPassword((prev) => !prev)
+          }
+          onMouseDown={(e) => e.preventDefault()}
+          edge="end"
+        >
+          {showConfirmPassword ? (
+            <VisibilityOff />
+          ) : (
+            <Visibility />
+          )}
+        </IconButton>
+      </InputAdornment>
+    ),
+  }}
+/>
 
             <TextField
               margin="normal"

@@ -1,10 +1,23 @@
 import React from "react";
 import { Container, Typography, Button, Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated, loading } = useAuth();
 
+  // ⏳ Wait for auth restoration
+  if (loading) {
+    return null; // or a spinner
+  }
+
+  // ✅ Already logged in → go to events
+  if (isAuthenticated) {
+    return <Navigate to="/events" replace />;
+  }
+
+  // ❌ Not logged in → show login/signup
   return (
     <Container maxWidth="md">
       <Box
@@ -19,9 +32,11 @@ const Home: React.FC = () => {
         <Typography variant="h2" component="h1" gutterBottom>
           Welcome to Event Manager
         </Typography>
+
         <Typography variant="h5" color="text.secondary" paragraph>
           Discover and register for exciting events
         </Typography>
+
         <Box sx={{ mt: 4, display: "flex", gap: 2 }}>
           <Button
             variant="contained"
@@ -30,6 +45,7 @@ const Home: React.FC = () => {
           >
             Login
           </Button>
+
           <Button
             variant="outlined"
             size="large"
