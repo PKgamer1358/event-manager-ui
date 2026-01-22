@@ -23,6 +23,7 @@ import {
   CircularProgress,
   useTheme
 } from "@mui/material";
+import axiosInstance from "../utils/axios";
 import {
   PieChart,
   Pie,
@@ -134,15 +135,12 @@ const EventDetails: React.FC = () => {
     }
   };
 
+
   const loadEventAnalytics = async () => {
     if (!id) return;
     try {
-      const response = await fetch(
-        `http://localhost:8000/analytics/event/${id}`,
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      );
-      if (!response.ok) throw new Error("Analytics fetch failed");
-      const data = await response.json();
+      const response = await axiosInstance.get(`/analytics/event/${id}`);
+      const data = response.data;
       const formatted = data.labels.map((label: string, i: number) => ({
         name: label,
         value: data.values[i],
@@ -155,22 +153,22 @@ const EventDetails: React.FC = () => {
 
   const loadRegistrationsOverTime = async () => {
     if (!id) return;
-    const res = await fetch(
-      `http://localhost:8000/analytics/event/${id}/registrations-over-time`,
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
-    const data = await res.json();
-    setTimelineData(data);
+    try {
+      const res = await axiosInstance.get(`/analytics/event/${id}/registrations-over-time`);
+      setTimelineData(res.data);
+    } catch (err) {
+      console.error("Failed to load timeline data", err);
+    }
   };
 
   const loadRegistrationsByYear = async () => {
     if (!id) return;
-    const res = await fetch(
-      `http://localhost:8000/analytics/event/${id}/registrations-by-year`,
-      { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-    );
-    const data = await res.json();
-    setYearData(data);
+    try {
+      const res = await axiosInstance.get(`/analytics/event/${id}/registrations-by-year`);
+      setYearData(res.data);
+    } catch (err) {
+      console.error("Failed to load year data", err);
+    }
   };
 
   const fetchEventMedia = async () => {
