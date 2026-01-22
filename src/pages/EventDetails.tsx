@@ -632,7 +632,7 @@ const EventDetails: React.FC = () => {
                   <ListItem>
                     <ListItemText
                       primary={`${r.user.first_name} ${r.user.last_name}`}
-                      secondary={`${r.user.email} • ${r.user.roll_number}`}
+                      secondary={r.user.roll_number ? `${r.user.email} • ${r.user.roll_number}` : r.user.email}
                     />
                   </ListItem>
                   {i < registrations.length - 1 && <Divider />}
