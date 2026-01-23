@@ -133,7 +133,7 @@ const Notifications: React.FC = () => {
                                                     variant="caption"
                                                     color="text.secondary"
                                                 >
-                                                    {new Date(notification.created_at).toLocaleString()}
+                                                    {new Date(notification.created_at.endsWith("Z") ? notification.created_at : notification.created_at + "Z").toLocaleString()}
                                                 </Typography>
                                             </>
                                         }
