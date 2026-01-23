@@ -461,10 +461,10 @@ const EventDetails: React.FC = () => {
                         fullWidth
                         size="large"
                         onClick={handleRegister}
-                        disabled={isFull}
+                        disabled={isFull || status === 'Past'}
                         sx={{ mt: 2 }}
                       >
-                        {isFull ? "Event Full" : "Register Now"}
+                        {status === 'Past' ? "Event Ended" : (isFull ? "Event Full" : "Register Now")}
                       </Button>
                     ) : (
                       <Box sx={{ mt: 2 }}>
