@@ -43,6 +43,16 @@ export const eventService = {
     });
   },
 
+  async uploadCoverImage(id: number, file: File): Promise<void> {
+    const formData = new FormData();
+    formData.append("file", file);
+    await axiosInstance.post(`/api/events/${id}/cover-image`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  },
+
   async deleteEventMedia(eventId: number, mediaId: number): Promise<void> {
     await axiosInstance.delete(`/api/events/${eventId}/media/${mediaId}`);
   },

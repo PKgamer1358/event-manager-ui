@@ -23,8 +23,9 @@ interface CreateEventModalProps {
     id: number;
     title: string;
     description: string;
+    image_url?: string;
     category: string;   // ✅ ADD
-    club?: string; 
+    club?: string;
     venue: string;
     start_time: string;
     end_time: string;
@@ -42,8 +43,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const [formData, setFormData] = useState<EventFormData>({
     title: "",
     description: "",
-    category: "",     
-    club: "", 
+    category: "",
+    club: "",
     venue: "",
     start_time: "",
     end_time: "",
@@ -51,6 +52,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -61,22 +63,32 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     setError("");
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCoverImage(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
     try {
+      let eventId: number;
+
       if (eventToEdit) {
         await eventService.updateEvent(eventToEdit.id, formData);
+        eventId = eventToEdit.id;
         if (onEventUpdated) onEventUpdated();
       } else {
-        await eventService.createEvent(formData);
+        const newEvent = await eventService.createEvent(formData);
+        eventId = newEvent.id;
         setFormData({
           title: "",
           description: "",
-          category: "",     
-    club: "", 
+          category: "",
+          club: "",
           venue: "",
           start_time: "",
           end_time: "",
@@ -84,8 +96,14 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         });
         if (onEventCreated) onEventCreated();
       }
+
+      // Upload Cover Image if selected
+      if (coverImage) {
+        await eventService.uploadCoverImage(eventId, coverImage);
+        setCoverImage(null);
+      }
     } catch (err: any) {
-      setError(err.response?.data?.detail || "Failed to create event");
+      setError(err.response?.data?.detail || "Failed to create/update event");
     } finally {
       setLoading(false);
     }
@@ -95,31 +113,32 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     setFormData({
       title: "",
       description: "",
-      category: "",     
-    club: "", 
+      category: "",
+      club: "",
       venue: "",
       start_time: "",
       end_time: "",
       capacity: 0,
     });
+    setCoverImage(null);
     setError("");
     onClose();
   };
 
   React.useEffect(() => {
-  if (eventToEdit) {
-    setFormData({
-      title: eventToEdit.title,
-      description: eventToEdit.description,
-      category: eventToEdit.category, // ✅ ADD
-      club: eventToEdit.club || "",   // ✅ ADD
-      venue: eventToEdit.venue,
-      start_time: eventToEdit.start_time,
-      end_time: eventToEdit.end_time,
-      capacity: eventToEdit.capacity,
-    });
-  }
-}, [eventToEdit]);
+    if (eventToEdit) {
+      setFormData({
+        title: eventToEdit.title,
+        description: eventToEdit.description,
+        category: eventToEdit.category, // ✅ ADD
+        club: eventToEdit.club || "",   // ✅ ADD
+        venue: eventToEdit.venue,
+        start_time: eventToEdit.start_time,
+        end_time: eventToEdit.end_time,
+        capacity: eventToEdit.capacity,
+      });
+    }
+  }, [eventToEdit]);
 
 
   return (
@@ -153,32 +172,32 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             onChange={handleChange}
           />
           <FormControl fullWidth margin="normal" required>
-  <InputLabel>Category</InputLabel>
-  <Select
-    name="category"
-    value={formData.category}
-    label="Category"
-    onChange={(e) =>
-      setFormData({ ...formData, category: e.target.value })
-    }
-  >
-    <MenuItem value="Technical">Technical</MenuItem>
-    <MenuItem value="Cultural">Cultural</MenuItem>
-    <MenuItem value="Sports">Sports</MenuItem>
-  </Select>
-</FormControl>
-<TextField
-  margin="normal"
-  fullWidth
-  name="club"
-  label="Club (Optional)"
-  placeholder="IEEE, CSI, Coding Club"
-  value={formData.club}
-  onChange={handleChange}
-/>
+            <InputLabel>Category</InputLabel>
+            <Select
+              name="category"
+              value={formData.category}
+              label="Category"
+              onChange={(e) =>
+                setFormData({ ...formData, category: e.target.value })
+              }
+            >
+              <MenuItem value="Technical">Technical</MenuItem>
+              <MenuItem value="Cultural">Cultural</MenuItem>
+              <MenuItem value="Sports">Sports</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            margin="normal"
+            fullWidth
+            name="club"
+            label="Club (Optional)"
+            placeholder="IEEE, CSI, Coding Club"
+            value={formData.club}
+            onChange={handleChange}
+          />
 
 
-          
+
           <TextField
             margin="normal"
             required
@@ -220,6 +239,21 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
             value={formData.capacity}
             onChange={handleChange}
           />
+
+          <Box sx={{ mt: 2 }}>
+            <InputLabel shrink>Cover Image (Optional)</InputLabel>
+            <input
+              accept="image/*"
+              type="file"
+              onChange={handleFileChange}
+              style={{ paddingTop: '10px' }}
+            />
+            {eventToEdit?.image_url && !coverImage && (
+              <Box sx={{ mt: 1, fontSize: '0.8rem', color: 'text.secondary' }}>
+                Current image will be kept unless you upload a new one.
+              </Box>
+            )}
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={loading}>
