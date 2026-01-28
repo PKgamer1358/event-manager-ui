@@ -23,7 +23,7 @@ export interface Event {
   club?: string;
   venue: string;
   start_time: string;
-  end_time: string;
+  end_time?: string | null;  // ✅ UPDATED
   capacity: number;
   registered_count?: number;
   created_by?: number;
@@ -69,7 +69,7 @@ export interface EventFormData {
   club?: string;
   venue: string;
   start_time: string;
-  end_time: string;
+  end_time?: string | null;  // ✅ UPDATED
   capacity: number;
 }
 

@@ -24,11 +24,11 @@ interface CreateEventModalProps {
     title: string;
     description: string;
     image_url?: string;
-    category: string;   // ✅ ADD
+    category: string;
     club?: string;
     venue: string;
     start_time: string;
-    end_time: string;
+    end_time?: string | null;  // ✅ UPDATED
     capacity: number;
   } | null;
 }
@@ -47,7 +47,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     club: "",
     venue: "",
     start_time: "",
-    end_time: "",
+    end_time: "",  // Initialize as empty string
     capacity: 0,
   });
   const [error, setError] = useState("");
@@ -78,11 +78,21 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       let eventId: number;
 
       if (eventToEdit) {
-        await eventService.updateEvent(eventToEdit.id, formData);
+        // Sanitize payload for update
+        const payload = {
+          ...formData,
+          end_time: formData.end_time === "" ? null : formData.end_time,
+        };
+        await eventService.updateEvent(eventToEdit.id, payload);
         eventId = eventToEdit.id;
         if (onEventUpdated) onEventUpdated();
       } else {
-        const newEvent = await eventService.createEvent(formData);
+        // Sanitize payload for create
+        const payload = {
+          ...formData,
+          end_time: formData.end_time === "" ? null : formData.end_time,
+        };
+        const newEvent = await eventService.createEvent(payload);
         eventId = newEvent.id;
         setFormData({
           title: "",
@@ -134,7 +144,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         club: eventToEdit.club || "",   // ✅ ADD
         venue: eventToEdit.venue,
         start_time: eventToEdit.start_time,
-        end_time: eventToEdit.end_time,
+        end_time: eventToEdit.end_time || "", // Handle null from backend
         capacity: eventToEdit.capacity,
       });
     }
@@ -184,6 +194,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               <MenuItem value="Technical">Technical</MenuItem>
               <MenuItem value="Cultural">Cultural</MenuItem>
               <MenuItem value="Sports">Sports</MenuItem>
+              <MenuItem value="Drama">Drama</MenuItem>
             </Select>
           </FormControl>
           <TextField
@@ -220,13 +231,13 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           />
           <TextField
             margin="normal"
-            required
+            // required  <-- REMOVED
             fullWidth
             name="end_time"
             label="End Time"
             type="datetime-local"
             InputLabelProps={{ shrink: true }}
-            value={formData.end_time}
+            value={formData.end_time || ""} // Handle null/undefined
             onChange={handleChange}
           />
           <TextField
