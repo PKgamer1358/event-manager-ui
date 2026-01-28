@@ -423,7 +423,9 @@ const EventDetails: React.FC = () => {
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant="subtitle2" color="text.secondary">End Time</Typography>
-                    <Typography variant="body1">{new Date(event.end_time).toLocaleString()}</Typography>
+                    <Typography variant="body1">
+                      {event.end_time ? new Date(event.end_time).toLocaleString() : 'N/A'}
+                    </Typography>
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                     <Typography variant="subtitle2" color="text.secondary">Club</Typography>
