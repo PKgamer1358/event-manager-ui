@@ -109,6 +109,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       if (coverImage) {
         await eventService.uploadCoverImage(eventId, coverImage);
         setCoverImage(null);
+        // Add small delay to ensure DB consistency
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
 
       if (eventToEdit) {

@@ -28,7 +28,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
         return new Date(dateString).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     };
 
-    const isFull = event.registered_count !== undefined && event.registered_count >= event.capacity;
+    const isFull = event.capacity !== null && event.registered_count !== undefined && event.registered_count >= event.capacity;
     const status = isFull ? 'Full' : (new Date(event.start_time) < new Date() ? 'Past' : 'Open');
 
     return (

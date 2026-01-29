@@ -299,7 +299,7 @@ const EventDetails: React.FC = () => {
   }
 
   const canEdit = user?.is_super_admin || (user?.is_admin && event?.created_by === user?.id);
-  const isFull = (event.registered_count || 0) >= event.capacity;
+  const isFull = event.capacity !== null && (event.registered_count || 0) >= event.capacity;
   const eventStart = new Date(event.start_time);
   const diffTime = eventStart.getTime() - new Date().getTime();
   const daysRemaining = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
