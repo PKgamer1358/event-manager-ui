@@ -93,16 +93,16 @@ const EventList: React.FC = () => {
     user?.is_super_admin || user?.is_admin;
 
 
-  const fetchEvents = async () => {
+  const fetchEvents = async (isRefresh = false) => {
     try {
-      setLoading(true);
+      if (!isRefresh) setLoading(true); // Only show full loader on first load
       const data = await eventService.getAllEvents();
       setEvents(data);
       setError("");
     } catch (err: any) {
       setError("Failed to load events");
     } finally {
-      setLoading(false);
+      if (!isRefresh) setLoading(false);
     }
   };
 
@@ -123,7 +123,7 @@ const EventList: React.FC = () => {
   };
 
   const handleEventCreated = () => {
-    fetchEvents();
+    fetchEvents(true); // Refresh quietly
     setOpenModal(false);
   };
 
@@ -137,7 +137,7 @@ const EventList: React.FC = () => {
 
   return (
     <>
-      <PullToRefresh onRefresh={fetchEvents}>
+      <PullToRefresh onRefresh={() => fetchEvents(true)}>
         <Box sx={{ pb: 8 }}>
           <PageHeader
             title="Explore Events"

@@ -42,7 +42,7 @@ const HomeInsightsView: React.FC = () => {
     }, []);
 
     if (loading) return null;
-    if (error) return <Typography color="error" sx={{ mb: 2 }}>Error: {error}</Typography>;
+    if (error) return null; // Avoid showing error text in dashboard for minor fetch failures
     if (!insights) return null;
 
     if (isAdmin) {
