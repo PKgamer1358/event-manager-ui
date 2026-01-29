@@ -48,7 +48,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     venue: "",
     start_time: "",
     end_time: "",  // Initialize as empty string
-    capacity: 0,
+    capacity: null,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -85,7 +85,6 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         };
         await eventService.updateEvent(eventToEdit.id, payload);
         eventId = eventToEdit.id;
-        if (onEventUpdated) onEventUpdated();
       } else {
         // Sanitize payload for create
         const payload = {
@@ -102,15 +101,20 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           venue: "",
           start_time: "",
           end_time: "",
-          capacity: 0,
+          capacity: null,
         });
-        if (onEventCreated) onEventCreated();
       }
 
       // Upload Cover Image if selected
       if (coverImage) {
         await eventService.uploadCoverImage(eventId, coverImage);
         setCoverImage(null);
+      }
+
+      if (eventToEdit) {
+        if (onEventUpdated) onEventUpdated();
+      } else {
+        if (onEventCreated) onEventCreated();
       }
     } catch (err: any) {
       setError(err.response?.data?.detail || "Failed to create/update event");
@@ -128,7 +132,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
       venue: "",
       start_time: "",
       end_time: "",
-      capacity: 0,
+      capacity: null,
     });
     setCoverImage(null);
     setError("");
@@ -194,6 +198,8 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               <MenuItem value="Technical">Technical</MenuItem>
               <MenuItem value="Cultural">Cultural</MenuItem>
               <MenuItem value="Sports">Sports</MenuItem>
+              <MenuItem value="Esports">Esports</MenuItem>
+              <MenuItem value="Art">Art</MenuItem>
               <MenuItem value="Drama">Drama</MenuItem>
             </Select>
           </FormControl>
@@ -242,13 +248,19 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           />
           <TextField
             margin="normal"
-            required
+            // required <-- REMOVED
             fullWidth
             name="capacity"
-            label="Capacity"
+            label="Capacity (Leave empty for unlimited)"
             type="number"
-            value={formData.capacity}
-            onChange={handleChange}
+            value={formData.capacity === null ? "" : formData.capacity}
+            onChange={(e) => {
+              const val = e.target.value;
+              setFormData({
+                ...formData,
+                capacity: val === "" ? null : parseInt(val),
+              });
+            }}
           />
 
           <Box sx={{ mt: 2 }}>
@@ -275,7 +287,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
           </Button>
         </DialogActions>
       </Box>
-    </Dialog>
+    </Dialog >
   );
 };
 

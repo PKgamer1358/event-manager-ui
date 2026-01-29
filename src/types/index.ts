@@ -70,7 +70,7 @@ export interface EventFormData {
   venue: string;
   start_time: string;
   end_time?: string | null;  // ✅ UPDATED
-  capacity: number;
+  capacity: number | null;
 }
 
 export interface College {
