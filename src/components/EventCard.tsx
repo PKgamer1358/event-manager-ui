@@ -25,11 +25,19 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     const theme = useTheme();
 
     const handleTime = (dateString: string) => {
-        return new Date(dateString).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        try {
+            return new Date(dateString).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        } catch (e) {
+            return "";
+        }
     };
 
+    // Safety check for date
+    const startDate = new Date(event.start_time);
+    const isValidDate = !isNaN(startDate.getTime());
+
     const isFull = event.capacity !== null && event.registered_count !== undefined && event.registered_count >= event.capacity;
-    const status = isFull ? 'Full' : (new Date(event.start_time) < new Date() ? 'Past' : 'Open');
+    const status = isFull ? 'Full' : ((isValidDate && startDate < new Date()) ? 'Past' : 'Open');
 
     return (
         <Card
@@ -84,10 +92,10 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
                     }}
                 >
                     <Box component="span" sx={{ fontSize: '1rem', fontWeight: 800 }}>
-                        {new Date(event.start_time).getDate()}
+                        {isValidDate ? startDate.getDate() : "--"}
                     </Box>
                     <Box component="span" sx={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'text.secondary' }}>
-                        {new Date(event.start_time).toLocaleString('default', { month: 'short' })}
+                        {isValidDate ? startDate.toLocaleString('default', { month: 'short' }) : ""}
                     </Box>
                 </Box>
                 <Box sx={{ position: 'absolute', top: 12, left: 12 }}>
@@ -119,7 +127,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
                         <Stack direction="row" spacing={1} alignItems="center">
                             <PeopleIcon fontSize="small" sx={{ color: 'text.disabled' }} />
                             <Typography variant="caption" color="text.secondary">
-                                {event.registered_count || 0} / {event.capacity ? event.capacity : '∞'} registered
+                                {event.registered_count || 0} / {event.capacity !== null ? event.capacity : 'Unlimited'} registered
                             </Typography>
                         </Stack>
                     </Box>
