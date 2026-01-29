@@ -119,7 +119,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
                         <Stack direction="row" spacing={1} alignItems="center">
                             <PeopleIcon fontSize="small" sx={{ color: 'text.disabled' }} />
                             <Typography variant="caption" color="text.secondary">
-                                {event.registered_count || 0} / {event.capacity} registered
+                                {event.registered_count || 0} / {event.capacity ? event.capacity : '∞'} registered
                             </Typography>
                         </Stack>
                     </Box>
