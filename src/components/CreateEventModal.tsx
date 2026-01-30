@@ -82,6 +82,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         const payload = {
           ...formData,
           end_time: formData.end_time === "" ? null : formData.end_time,
+          capacity: (formData.capacity === 0 || formData.capacity === null) ? null : formData.capacity,
         };
         await eventService.updateEvent(eventToEdit.id, payload);
         eventId = eventToEdit.id;
@@ -90,6 +91,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         const payload = {
           ...formData,
           end_time: formData.end_time === "" ? null : formData.end_time,
+          capacity: (formData.capacity === 0 || formData.capacity === null) ? null : formData.capacity,
         };
         const newEvent = await eventService.createEvent(payload);
         eventId = newEvent.id;
