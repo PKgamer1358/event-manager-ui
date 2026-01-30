@@ -186,6 +186,15 @@ const EventDetails: React.FC = () => {
     return `${API_BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
   };
 
+  const getDownloadUrl = (path: string) => {
+    const url = getFileUrl(path);
+    // If it's a Cloudinary URL, inject fl_attachment to force download
+    if (url.includes("cloudinary.com") && url.includes("/upload/")) {
+      return url.replace("/upload/", "/upload/fl_attachment/");
+    }
+    return url;
+  };
+
   const handleRegister = async () => {
     if (!id) return;
     try {
@@ -543,7 +552,7 @@ const EventDetails: React.FC = () => {
                   <Typography>{item.file_url.split('/').pop()}</Typography>
                 </Box>
                 <Stack direction="row" spacing={1}>
-                  <Button href={getFileUrl(item.file_url)} target="_blank" variant="outlined" size="small">
+                  <Button href={getDownloadUrl(item.file_url)} target="_blank" variant="outlined" size="small">
                     Download
                   </Button>
                   {canEdit && (
