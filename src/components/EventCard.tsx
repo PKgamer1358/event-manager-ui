@@ -36,7 +36,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
     const startDate = new Date(event.start_time);
     const isValidDate = !isNaN(startDate.getTime());
 
-    const isFull = event.capacity !== null && event.registered_count !== undefined && event.registered_count >= event.capacity;
+    const isFull = event.capacity !== null && event.capacity > 0 && event.registered_count !== undefined && event.registered_count >= event.capacity;
     const status = isFull ? 'Full' : ((isValidDate && startDate < new Date()) ? 'Past' : 'Open');
 
     return (
@@ -127,7 +127,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onClick }) => {
                         <Stack direction="row" spacing={1} alignItems="center">
                             <PeopleIcon fontSize="small" sx={{ color: 'text.disabled' }} />
                             <Typography variant="caption" color="text.secondary">
-                                {event.registered_count || 0} / {event.capacity !== null ? event.capacity : 'Unlimited'} registered
+                                {event.registered_count || 0} / {event.capacity !== null && event.capacity > 0 ? event.capacity : 'Unlimited'} registered
                             </Typography>
                         </Stack>
                     </Box>

@@ -86,7 +86,7 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
         venue: data.venue,
         start_time: data.start_time,
         end_time: data.end_time || null, // Convert empty string to null
-        capacity: (data.capacity === 0 || data.capacity === null) ? null : data.capacity,
+        capacity: (data.capacity === null || data.capacity <= 0) ? null : data.capacity,
       });
 
       if (eventToEdit) {

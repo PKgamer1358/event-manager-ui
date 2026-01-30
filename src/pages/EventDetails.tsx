@@ -444,10 +444,10 @@ const EventDetails: React.FC = () => {
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                       <Typography variant="body2" color="text.secondary">Spots Filled</Typography>
                       <Typography variant="body2" fontWeight="bold">
-                        {event.registered_count}/{event.capacity !== null ? event.capacity : 'Unlimited'}
+                        {event.registered_count}/{event.capacity && event.capacity > 0 ? event.capacity : 'Unlimited'}
                       </Typography>
                     </Box>
-                    {event.capacity !== null && (
+                    {event.capacity !== null && event.capacity > 0 && (
                       <Box sx={{ width: '100%', height: 6, bgcolor: 'grey.200', borderRadius: 1, overflow: 'hidden' }}>
                         <Box sx={{
                           width: `${Math.min(((event.registered_count || 0) / event.capacity) * 100, 100)}%`,
