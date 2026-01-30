@@ -320,36 +320,66 @@ const EventDetails: React.FC = () => {
       <Box
         sx={{
           position: 'relative',
-          height: { xs: 300, md: 400 }, // Increased mobile height
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'block' }, // Stack on mobile, Block on desktop
+          height: { xs: 'auto', md: 400 },
           width: '100%',
-          bgcolor: 'grey.300',
+          bgcolor: 'grey.900', // Dark background for the whole container
           overflow: 'hidden'
         }}
       >
-        {event.image_url ? (
-          <Box
-            component="img"
-            src={event.image_url}
-            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <Box sx={{ width: '100%', height: '100%', background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})` }} />
-        )}
+        {/* Image Container */}
         <Box
           sx={{
-            position: 'absolute',
+            position: { xs: 'relative', md: 'absolute' }, // Relative on mobile, Absolute on desktop
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: { xs: 250, md: '100%' }, // Fixed height on mobile
+            zIndex: 0
+          }}
+        >
+          {event.image_url ? (
+            <Box
+              component="img"
+              src={event.image_url}
+              sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <Box sx={{ width: '100%', height: '100%', background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})` }} />
+          )}
+          {/* Desktop Gradient Overlay (Only visible on desktop) */}
+          <Box
+            sx={{
+              display: { xs: 'none', md: 'block' },
+              position: 'absolute',
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
+            }}
+          />
+        </Box>
+
+        {/* Content Container */}
+        <Box
+          sx={{
+            position: { xs: 'relative', md: 'absolute' }, // Relative on mobile
             bottom: 0,
             left: 0,
             right: 0,
-            background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
-            p: { xs: 2, md: 4 }, // Reduced padding on mobile
-            pt: 8
+            zIndex: 1,
+            // Mobile: Solid background, Desktop: Transparent (handled by overlay above)
+            bgcolor: { xs: '#1a1a1a', md: 'transparent' },
+            p: { xs: 3, md: 4 },
+            pt: { xs: 3, md: 8 },
+            display: 'flex',
+            alignItems: 'flex-end',
+            minHeight: { xs: 'auto', md: '100%' } // Allow content to flow naturally on mobile
           }}
         >
-          <Container maxWidth="xl">
+          <Container maxWidth="xl" disableGutters>
             <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'flex-end' }} justifyContent="space-between" spacing={2}>
               <Box sx={{ color: 'white', width: '100%' }}>
-                <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
+                <Box sx={{ mb: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   <Chip
                     label={event.category}
                     color="primary"
@@ -367,23 +397,23 @@ const EventDetails: React.FC = () => {
                   variant="h3"
                   fontWeight="bold"
                   sx={{
-                    textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                    fontSize: { xs: '1.75rem', md: '3rem' }, // Responsive font size
+                    textShadow: { xs: 'none', md: '0 2px 4px rgba(0,0,0,0.5)' }, // No shadow on solid background
+                    fontSize: { xs: '1.75rem', md: '3rem' },
                     lineHeight: 1.2,
                     mb: 1
                   }}
                 >
                   {event.title}
                 </Typography>
-                <Stack direction="row" spacing={2} sx={{ mt: 1, color: 'rgba(255,255,255,0.9)' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Stack direction="column" spacing={1} sx={{ mt: 1, color: 'rgba(255,255,255,0.9)' }}>
+                  <Stack direction="row" spacing={1} alignItems="center">
                     <EventIcon fontSize="small" />
                     <Typography variant="body2">{new Date(event.start_time).toLocaleDateString()}</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  </Stack>
+                  <Stack direction="row" spacing={1} alignItems="center">
                     <LocationOnIcon fontSize="small" />
-                    <Typography variant="body2" noWrap sx={{ maxWidth: { xs: 200, md: 'none' } }}>{event.venue}</Typography>
-                  </Box>
+                    <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>{event.venue}</Typography>
+                  </Stack>
                 </Stack>
               </Box>
               <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', md: 'auto' }, pt: { xs: 2, md: 0 } }}>
