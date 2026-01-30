@@ -46,6 +46,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DownloadIcon from "@mui/icons-material/Download";
+
 import { useParams, useNavigate } from "react-router-dom";
 import { Event, EventMedia } from "../types";
 import { eventService } from "../services/eventService";
@@ -98,6 +99,7 @@ const EventDetails: React.FC = () => {
   const [yearData, setYearData] = useState<any[]>([]);
   const [media, setMedia] = useState<EventMedia[]>([]);
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+
   const [uploading, setUploading] = useState(false);
   const [tabValue, setTabValue] = useState(0);
 
@@ -348,6 +350,7 @@ const EventDetails: React.FC = () => {
           ) : (
             <Box sx={{ width: '100%', height: '100%', background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})` }} />
           )}
+
           {/* Desktop Gradient Overlay (Only visible on desktop) */}
           <Box
             sx={{

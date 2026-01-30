@@ -8,7 +8,11 @@ import {
   TextField,
   Alert,
   Box,
+  Slider,
+  Typography,
 } from "@mui/material";
+import Cropper from "react-easy-crop";
+import getCroppedImg from "../utils/cropImage";
 import { eventService } from "../services/eventService";
 import { EventFormData } from "../types";
 import { MenuItem, Select, FormControl, InputLabel } from "@mui/material";
@@ -54,6 +58,13 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [coverImage, setCoverImage] = useState<File | null>(null);
 
+  // Crop State
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [isCropping, setIsCropping] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -63,9 +74,34 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     setError("");
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setCoverImage(e.target.files[0]);
+  const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  const showCroppedImage = async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
+    try {
+      const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+      if (croppedBlob) {
+        const file = new File([croppedBlob], "cover_image.jpg", { type: "image/jpeg" });
+        setCoverImage(file);
+        setIsCropping(false); // Exit crop mode
+      }
+    } catch (e) {
+      console.error(e);
+      setError("Failed to crop image");
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.addEventListener("load", () => {
+        setImageSrc(reader.result?.toString() || "");
+        setIsCropping(true); // Enable crop mode
+      });
+      reader.readAsDataURL(file);
     }
   };
 
@@ -160,6 +196,52 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     }
   }, [eventToEdit]);
 
+
+  const handleCancelCrop = () => {
+    setIsCropping(false);
+    setCoverImage(null);
+    setImageSrc(null);
+  };
+
+  if (isCropping && imageSrc) {
+    return (
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle>Crop Cover Image</DialogTitle>
+        <DialogContent>
+          <Box sx={{ position: "relative", width: "100%", height: 300, bgcolor: '#333' }}>
+            <Cropper
+              image={imageSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={16 / 9} // Enforce 16:9 aspect ratio for event covers
+              onCropChange={setCrop}
+              onCropComplete={onCropComplete}
+              onZoomChange={setZoom}
+            />
+          </Box>
+          <Box sx={{ mt: 3 }}>
+            <Typography gutterBottom>Zoom</Typography>
+            <Slider
+              value={zoom}
+              min={1}
+              max={3}
+              step={0.1}
+              aria-labelledby="Zoom"
+              onChange={(e, zoom) => setZoom(Number(zoom))}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelCrop} color="inherit">
+            Cancel
+          </Button>
+          <Button onClick={showCroppedImage} variant="contained" color="primary">
+            Apply Crop
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -277,6 +359,11 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
               onChange={handleFileChange}
               style={{ paddingTop: '10px' }}
             />
+            {coverImage && (
+              <Box sx={{ mt: 1, color: 'success.main', fontWeight: 'bold' }}>
+                ✓ New Image Selected (k)
+              </Box>
+            )}
             {eventToEdit?.image_url && !coverImage && (
               <Box sx={{ mt: 1, fontSize: '0.8rem', color: 'text.secondary' }}>
                 Current image will be kept unless you upload a new one.
