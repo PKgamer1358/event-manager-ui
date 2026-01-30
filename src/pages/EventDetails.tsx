@@ -320,7 +320,7 @@ const EventDetails: React.FC = () => {
       <Box
         sx={{
           position: 'relative',
-          height: { xs: 200, md: 350 },
+          height: { xs: 300, md: 400 }, // Increased mobile height
           width: '100%',
           bgcolor: 'grey.300',
           overflow: 'hidden'
@@ -341,14 +341,14 @@ const EventDetails: React.FC = () => {
             bottom: 0,
             left: 0,
             right: 0,
-            background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
-            p: 4,
+            background: 'linear-gradient(to top, rgba(0,0,0,0.9), transparent)',
+            p: { xs: 2, md: 4 }, // Reduced padding on mobile
             pt: 8
           }}
         >
           <Container maxWidth="xl">
-            <Stack direction={{ xs: 'column', md: 'row' }} alignItems="flex-end" justifyContent="space-between" spacing={2}>
-              <Box sx={{ color: 'white' }}>
+            <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'flex-end' }} justifyContent="space-between" spacing={2}>
+              <Box sx={{ color: 'white', width: '100%' }}>
                 <Box sx={{ mb: 1, display: 'flex', gap: 1 }}>
                   <Chip
                     label={event.category}
@@ -363,27 +363,36 @@ const EventDetails: React.FC = () => {
                     sx={{ fontWeight: 'bold' }}
                   />
                 </Box>
-                <Typography variant="h3" fontWeight="bold" sx={{ textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                <Typography
+                  variant="h3"
+                  fontWeight="bold"
+                  sx={{
+                    textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                    fontSize: { xs: '1.75rem', md: '3rem' }, // Responsive font size
+                    lineHeight: 1.2,
+                    mb: 1
+                  }}
+                >
                   {event.title}
                 </Typography>
                 <Stack direction="row" spacing={2} sx={{ mt: 1, color: 'rgba(255,255,255,0.9)' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <EventIcon fontSize="small" />
-                    <Typography variant="body1">{new Date(event.start_time).toLocaleDateString()}</Typography>
+                    <Typography variant="body2">{new Date(event.start_time).toLocaleDateString()}</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <LocationOnIcon fontSize="small" />
-                    <Typography variant="body1">{event.venue}</Typography>
+                    <Typography variant="body2" noWrap sx={{ maxWidth: { xs: 200, md: 'none' } }}>{event.venue}</Typography>
                   </Box>
                 </Stack>
               </Box>
-              <Stack direction="row" spacing={1}>
+              <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', md: 'auto' }, pt: { xs: 2, md: 0 } }}>
                 {canEdit && (
                   <>
-                    <Button variant="contained" color="inherit" startIcon={<EditIcon />} sx={{ color: 'text.primary' }} onClick={() => setEditModalOpen(true)}>
+                    <Button variant="contained" color="inherit" fullWidth size="small" startIcon={<EditIcon />} sx={{ color: 'text.primary' }} onClick={() => setEditModalOpen(true)}>
                       Edit
                     </Button>
-                    <Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={handleDeleteEvent}>
+                    <Button variant="contained" color="error" fullWidth size="small" startIcon={<DeleteIcon />} onClick={handleDeleteEvent}>
                       Delete
                     </Button>
                   </>
@@ -393,7 +402,7 @@ const EventDetails: React.FC = () => {
           </Container>
         </Box>
         <IconButton
-          sx={{ position: 'absolute', top: 16, left: 16, bgcolor: 'rgba(255,255,255,0.8)', '&:hover': { bgcolor: 'white' } }}
+          sx={{ position: 'absolute', top: 16, left: 16, bgcolor: 'rgba(255,255,255,0.8)', '&:hover': { bgcolor: 'white' }, zIndex: 10 }}
           onClick={() => navigate('/events')}
         >
           <ArrowBackIcon />
@@ -402,7 +411,7 @@ const EventDetails: React.FC = () => {
 
       <Container maxWidth="xl" sx={{ mt: 4 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)}>
+          <Tabs value={tabValue} onChange={(e, v) => setTabValue(v)} variant="scrollable" scrollButtons="auto">
             <Tab label="Overview" />
             <Tab label="Media & Gallery" />
             {canEdit && <Tab label="Admin Dashboard" />}
@@ -417,7 +426,7 @@ const EventDetails: React.FC = () => {
         <TabPanel value={tabValue} index={0}>
           <Grid container spacing={4}>
             <Grid size={{ xs: 12, md: 8 }}>
-              <Paper sx={{ p: 4, mb: 4 }}>
+              <Paper sx={{ p: { xs: 2, md: 4 }, mb: 4 }}>
                 <Typography variant="h6" gutterBottom fontWeight="bold">About Event</Typography>
                 <Typography variant="body1" paragraph color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
                   {event.description}
@@ -549,10 +558,15 @@ const EventDetails: React.FC = () => {
               <Paper key={item.id} sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: 600 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <DownloadIcon color="action" />
-                  <Typography>{item.file_url.split('/').pop()}</Typography>
+                  <Typography noWrap sx={{ maxWidth: 200 }}>{item.file_url.split('/').pop()}</Typography>
                 </Box>
                 <Stack direction="row" spacing={1}>
-                  <Button href={getDownloadUrl(item.file_url)} target="_blank" variant="outlined" size="small">
+                  <Button
+                    href={getDownloadUrl(item.file_url)}
+                    download // Hint to browser
+                    variant="outlined"
+                    size="small"
+                  >
                     Download
                   </Button>
                   {canEdit && (
