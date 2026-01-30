@@ -107,8 +107,8 @@ const EventDetails: React.FC = () => {
       setLoading(true);
       const data = await eventService.getEventById(Number(id));
       setEvent(data);
-    } catch {
-      setError("Failed to load event details");
+    } catch (err: any) {
+      setError(err.response?.data?.detail || err.message || "Failed to load event details");
     } finally {
       setLoading(false);
     }
@@ -292,7 +292,7 @@ const EventDetails: React.FC = () => {
   if (!event) {
     return (
       <Container sx={{ mt: 4 }}>
-        <Alert severity="error">Event not found</Alert>
+        <Alert severity="error">{error || "Event not found"}</Alert>
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate("/events")} sx={{ mt: 2 }}>Back to Events</Button>
       </Container>
     );
