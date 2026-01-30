@@ -77,22 +77,24 @@ const CreateEventModal: React.FC<CreateEventModalProps> = ({
     try {
       let eventId: number;
 
+      // Helper to sanitize payload
+      const sanitizePayload = (data: EventFormData) => ({
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        club: data.club || null, // Convert empty string to null
+        venue: data.venue,
+        start_time: data.start_time,
+        end_time: data.end_time || null, // Convert empty string to null
+        capacity: (data.capacity === 0 || data.capacity === null) ? null : data.capacity,
+      });
+
       if (eventToEdit) {
-        // Sanitize payload for update
-        const payload = {
-          ...formData,
-          end_time: formData.end_time === "" ? null : formData.end_time,
-          capacity: (formData.capacity === 0 || formData.capacity === null) ? null : formData.capacity,
-        };
+        const payload = sanitizePayload(formData);
         await eventService.updateEvent(eventToEdit.id, payload);
         eventId = eventToEdit.id;
       } else {
-        // Sanitize payload for create
-        const payload = {
-          ...formData,
-          end_time: formData.end_time === "" ? null : formData.end_time,
-          capacity: (formData.capacity === 0 || formData.capacity === null) ? null : formData.capacity,
-        };
+        const payload = sanitizePayload(formData);
         const newEvent = await eventService.createEvent(payload);
         eventId = newEvent.id;
         setFormData({

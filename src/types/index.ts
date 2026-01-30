@@ -66,7 +66,7 @@ export interface EventFormData {
   title: string;
   description: string;
   category: string;   // ✅ ADD
-  club?: string;
+  club?: string | null;
   venue: string;
   start_time: string;
   end_time?: string | null;  // ✅ UPDATED
