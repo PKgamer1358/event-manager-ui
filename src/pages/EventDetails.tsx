@@ -562,8 +562,7 @@ const EventDetails: React.FC = () => {
                 </Box>
                 <Stack direction="row" spacing={1}>
                   <Button
-                    href={getDownloadUrl(item.file_url)}
-                    download // Hint to browser
+                    onClick={() => window.open(getDownloadUrl(item.file_url), '_system')} // Force System Browser for correct download behavior in App
                     variant="outlined"
                     size="small"
                   >

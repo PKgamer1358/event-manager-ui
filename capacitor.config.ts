@@ -6,7 +6,8 @@ const config: CapacitorConfig = {
   webDir: 'build',
 
   server: {
-    androidScheme: 'http',
+    url: 'https://event-manager-ui-two.vercel.app', // Points to live version
+    androidScheme: 'https',
     cleartext: true
   }
 };
