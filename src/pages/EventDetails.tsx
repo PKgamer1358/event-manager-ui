@@ -192,40 +192,24 @@ const EventDetails: React.FC = () => {
   const handleDownload = async (mediaItem: EventMedia) => {
     if (!id) return;
 
-    // Open window immediately to bypass popup blockers
-    // We'll redirect this window once we get the URL
-    // Use _system for mobile app compatibility, though _blank is standard for web
-    // For desktop web, _blank is better. For hybrid apps, _system might be needed.
-    // Let's try opening a blank target which usually works for both if we set href.
-    const newWindow = window.open('', '_system');
-
     try {
-      if (newWindow) {
-        newWindow.document.write("Generating secure download link...");
-      }
-
       const fullUrl = getFileUrl(mediaItem.file_url);
 
-      // If not Cloudinary, just open it
+      // If not Cloudinary, just open it in new tab/system
       if (!fullUrl.includes("cloudinary.com")) {
-        if (newWindow) newWindow.location.href = fullUrl;
-        else window.open(fullUrl, '_system');
+        window.open(fullUrl, '_system');
         return;
       }
 
       // Fetch signed URL from backend
+      // We use window.location.href to trigger the download in the same tab.
+      // Since the URL has fl_attachment, it will download the file without navigating away.
+      // This avoids popup blockers and is more reliable on desktop.
       const signedUrl = await eventService.getDownloadUrl(Number(id), mediaItem.id);
-
-      if (newWindow) {
-        newWindow.location.href = signedUrl;
-      } else {
-        // Fallback if window creation failed (rare)
-        window.location.href = signedUrl;
-      }
+      window.location.href = signedUrl;
 
     } catch (err) {
       console.error("Download error", err);
-      if (newWindow) newWindow.close();
       alert("Failed to generate download link. Please try again.");
     }
   };
