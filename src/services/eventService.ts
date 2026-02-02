@@ -57,6 +57,13 @@ export const eventService = {
     await axiosInstance.delete(`/api/events/${eventId}/media/${mediaId}`);
   },
 
+  async getDownloadUrl(eventId: number, mediaId: number): Promise<string> {
+    const response = await axiosInstance.get<{ download_url: string }>(
+      `/api/events/${eventId}/media/${mediaId}/download`
+    );
+    return response.data.download_url;
+  },
+
   async getEventInsights(id: number): Promise<import("../types").EventInsights> {
     const response = await axiosInstance.get<import("../types").EventInsights>(
       `/api/events/${id}/insights`

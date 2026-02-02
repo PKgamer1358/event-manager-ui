@@ -188,13 +188,26 @@ const EventDetails: React.FC = () => {
     return `${API_BASE_URL}${path.startsWith("/") ? "" : "/"}${path}`;
   };
 
-  const getDownloadUrl = (path: string) => {
-    const url = getFileUrl(path);
-    // If it's a Cloudinary URL, inject fl_attachment to force download
-    if (url.includes("cloudinary.com") && url.includes("/upload/")) {
-      return url.replace("/upload/", "/upload/fl_attachment/");
+
+  const handleDownload = async (mediaItem: EventMedia) => {
+    if (!id) return;
+    try {
+      const fullUrl = getFileUrl(mediaItem.file_url);
+
+      // If not Cloudinary, just open it
+      if (!fullUrl.includes("cloudinary.com")) {
+        window.open(fullUrl, '_system');
+        return;
+      }
+
+      // Fetch signed URL from backend
+      const signedUrl = await eventService.getDownloadUrl(Number(id), mediaItem.id);
+      window.open(signedUrl, '_system');
+    } catch (err) {
+      console.error("Download error", err);
+      // Fallback to original URL
+      window.open(getFileUrl(mediaItem.file_url), '_system');
     }
-    return url;
   };
 
   const handleRegister = async () => {
@@ -595,7 +608,7 @@ const EventDetails: React.FC = () => {
                 </Box>
                 <Stack direction="row" spacing={1}>
                   <Button
-                    onClick={() => window.open(getDownloadUrl(item.file_url), '_system')} // Force System Browser for correct download behavior in App
+                    onClick={() => handleDownload(item)} // Force System Browser for correct download behavior in App
                     variant="outlined"
                     size="small"
                   >
