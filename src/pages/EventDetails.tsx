@@ -202,11 +202,17 @@ const EventDetails: React.FC = () => {
       }
 
       // Fetch signed URL from backend
-      // We use window.location.href to trigger the download in the same tab.
-      // Since the URL has fl_attachment, it will download the file without navigating away.
-      // This avoids popup blockers and is more reliable on desktop.
       const signedUrl = await eventService.getDownloadUrl(Number(id), mediaItem.id);
-      window.location.href = signedUrl;
+
+      // Use efficient cross-browser download method: hidden anchor tag
+      // This works better than window.location.href or window.open in Chrome/SPA context
+      const link = document.createElement('a');
+      link.href = signedUrl;
+      link.setAttribute('download', ''); // Hint to browser
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
 
     } catch (err) {
       console.error("Download error", err);
