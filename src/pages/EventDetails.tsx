@@ -201,18 +201,11 @@ const EventDetails: React.FC = () => {
         return;
       }
 
-      // Fetch signed URL from backend
-      const signedUrl = await eventService.getDownloadUrl(Number(id), mediaItem.id);
-
-      // Use efficient cross-browser download method: hidden anchor tag
-      // This works better than window.location.href or window.open in Chrome/SPA context
-      const link = document.createElement('a');
-      link.href = signedUrl;
-      link.setAttribute('download', ''); // Hint to browser
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Open the backend redirect endpoint directly
+      // This handles the signing and redirection on the server side
+      // Browsers treat this as a user-initiated navigation, so it works reliably
+      const downloadEndpoint = `${API_BASE_URL}/events/${id}/media/${mediaItem.id}/download-file`;
+      window.open(downloadEndpoint, '_system');
 
     } catch (err) {
       console.error("Download error", err);
