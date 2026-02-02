@@ -204,7 +204,8 @@ const EventDetails: React.FC = () => {
       // Open the backend redirect endpoint directly
       // This handles the signing and redirection on the server side
       // Browsers treat this as a user-initiated navigation, so it works reliably
-      const downloadEndpoint = `${API_BASE_URL}/events/${id}/media/${mediaItem.id}/download-file`;
+      // IMPORTANT: API_BASE_URL does not include /api, so we must add it.
+      const downloadEndpoint = `${API_BASE_URL}/api/events/${id}/media/${mediaItem.id}/download-file`;
       window.open(downloadEndpoint, '_system');
 
     } catch (err) {
