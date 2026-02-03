@@ -32,9 +32,9 @@ const Login: React.FC = () => {
   const { user } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
 
-if (user) {
-  return <Navigate to="/events" replace />;
-}
+  if (user) {
+    return <Navigate to="/events" replace />;
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -58,7 +58,7 @@ if (user) {
     } catch (err: any) {
       setError(
         err.response?.data?.detail ||
-          "Login failed. Please check your credentials."
+        "Login failed. Please check your credentials."
       );
     } finally {
       setLoading(false);
@@ -95,7 +95,7 @@ if (user) {
               required
               fullWidth
               id="username"
-              label="Email Address"
+              label="Email Address/Username"
               name="username"
               autoComplete="email"
               autoFocus
@@ -103,30 +103,30 @@ if (user) {
               onChange={handleChange}
             />
             <TextField
-  margin="normal"
-  required
-  fullWidth
-  name="password"
-  label="Password"
-  type={showPassword ? "text" : "password"}
-  id="password"
-  autoComplete="current-password"
-  value={formData.password}
-  onChange={handleChange}
-  InputProps={{
-    endAdornment: (
-      <InputAdornment position="end">
-        <IconButton
-          onClick={() => setShowPassword((prev) => !prev)}
-          onMouseDown={(e) => e.preventDefault()}
-          edge="end"
-        >
-          {showPassword ? <VisibilityOff /> : <Visibility />}
-        </IconButton>
-      </InputAdornment>
-    ),
-  }}
-/>
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type={showPassword ? "text" : "password"}
+              id="password"
+              autoComplete="current-password"
+              value={formData.password}
+              onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      onMouseDown={(e) => e.preventDefault()}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
 
             <Button
               type="submit"
